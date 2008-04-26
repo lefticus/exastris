@@ -19,6 +19,11 @@ namespace exastris
       {
       }
 
+      int distance(const Planet &p)
+      {
+	return round(sqrt( pow(fabs(p.m_x - m_x), 2) + pow(fabs(p.m_y - m_y), 2)));
+      }
+
       unsigned int m_initial_seed;
       unsigned int m_seed;
 
