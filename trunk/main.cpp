@@ -1,4 +1,4 @@
-#include "universe.hpp"
+#include "game.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -39,13 +39,13 @@ int main(int, char **)
 {
   using namespace std;
 
-  exastris::Universe u(1000);
+  exastris::Game game(101, "Jameson");
 
-  cout << "num galaxies: " << u.num_galaxies() << endl;
+  cout << "num galaxies: " << game.get_universe().num_galaxies() << endl;
 
-  for (int i = 0; i < u.num_galaxies(); ++i)
+  for (int i = 0; i < game.get_universe().num_galaxies(); ++i)
   {
-    exastris::Galaxy g(u.get_galaxy(i));
+    exastris::Galaxy g(game.get_universe().get_galaxy(i));
 
     cout << "num planets: " << g.num_planets() << endl;
     color graphic[256][256];
@@ -64,4 +64,8 @@ int main(int, char **)
     ss << "galaxy" << i << ".ppm";
     saveppm(ss.str(), graphic);
   }
+
+  cout << "Player: " << game.get_player().get_name() << " in galaxy: " << game.get_player().get_location().first << " at planet: " << game.get_player().get_location().second << endl;
+
+
 }
