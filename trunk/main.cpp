@@ -20,13 +20,13 @@ struct color
 
 };
 
-void saveppm(const std::string &filename, color graphic[][256])
+void saveppm(const std::string &filename, color graphic[][300])
 {
   std::ofstream f(filename.c_str());
-  f << "P3 256 256 255" << std::endl;
-  for (int y=0; y<256; y++)
+  f << "P3 300 300  255" << std::endl;
+  for (int y=0; y<300; y++)
   {
-    for (int x=0; x<256; x++)
+    for (int x=0; x<300; x++)
     {
       f << graphic[x][y].red << " " << graphic[x][y].green << " " << graphic[x][y].blue << "   ";
     }
@@ -48,7 +48,7 @@ int main(int, char **)
     exastris::Galaxy g(game.get_universe().get_galaxy(i));
 
     cout << "num planets: " << g.num_planets() << endl;
-    color graphic[256][256];
+    color graphic[300][300];
 
     for (int j = 0; j < g.num_planets(); ++j)
     {
