@@ -13,8 +13,8 @@ namespace exastris
       Player(const std::string &t_name, const Location &t_location)
 	: m_name(t_name),
           m_location(t_location),
-	  m_fuel_capacity(10),
-	  m_fuel_level(10)
+	  m_fuel_capacity(50),
+	  m_fuel_level(50)
       {
       }
 
@@ -33,7 +33,7 @@ namespace exastris
 	m_location = t_loc;
       }
 
-      int get_fuel_level()
+      int get_fuel_level() const
       {
 	return m_fuel_level;
       }

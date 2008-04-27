@@ -11,7 +11,7 @@ namespace exastris
     public:
       Galaxy(int seed, const Planetary_Stats &ps)
 	: m_seed(seed),
-	  m_num_planets(random_scalar(get_seed(m_seed, 0), 750, 1500)),
+	  m_num_planets(random_scalar(get_seed(m_seed, 0), 500, 1000)),
 	  m_galaxy_modifier(Planetary_Stats(get_seed(m_seed, 1), 0.75, 1.25) * ps)
       {
       }
