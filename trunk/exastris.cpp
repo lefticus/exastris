@@ -57,6 +57,7 @@ protected:
   //Overridden default signal handlers:
   virtual void on_realize();
   virtual bool on_expose_event(GdkEventExpose* event);
+  virtual bool on_button_press_event(GdkEventButton* event);
 
   Glib::RefPtr<Gdk::GC> gc_;
   Gdk::Color blue_, red_, green_, black_, white_, grey_, yellow_;
@@ -102,7 +103,7 @@ PPI::PPI(exastris::Game &t_game)
   loop = 0;
   alpha = 0.0;
 
-  add_events(Gdk::EXPOSURE_MASK);
+  add_events(Gdk::EXPOSURE_MASK|Gdk::BUTTON_PRESS_MASK );
 }
 
 
@@ -127,6 +128,11 @@ void PPI::on_realize()
   gc_->set_foreground(green_);
 }
 
+bool PPI::on_button_press_event(GdkEventButton*e)
+{
+  std::cout << "Button pressed: " << e->x << " " << e->y << std::endl;
+  return true;
+}
 
 bool PPI::on_expose_event(GdkEventExpose*)
 {
