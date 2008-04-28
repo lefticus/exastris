@@ -21,11 +21,11 @@ namespace exastris
       Planetary_Stats operator*(const Planetary_Stats &ps)
       {
 	return Planetary_Stats(
-	    fit_range(ps.m_red * m_red, 0.0, 255.0),
-	    fit_range(ps.m_green * m_green, 0.0, 255.0),
-	    fit_range(ps.m_blue * m_blue, 0.0, 255.0),
-	    fit_range(ps.m_technology_level * m_technology_level, 0.0, 255.0),
-	    fit_range(ps.m_governmental_control_level * m_governmental_control_level, 0.0, 255.0)
+	    fit_range(ps.m_red * m_red, 0.0, 1.0),
+	    fit_range(ps.m_green * m_green, 0.0, 1.0),
+	    fit_range(ps.m_blue * m_blue, 0.0, 1.0),
+	    fit_range(ps.m_technology_level * m_technology_level, 0.0, 1.0),
+	    fit_range(ps.m_governmental_control_level * m_governmental_control_level, 0.0, 1.0)
 	  );
       }
 

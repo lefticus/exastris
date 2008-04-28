@@ -139,45 +139,41 @@ bool PPI::on_expose_event(GdkEventExpose*)
   // we need a ref to the gdkmm window
   Glib::RefPtr<Gdk::Window> window = get_window();
 
-  // window geometry: x, y, width, height, depth
-  int winx, winy, winw, winh, wind;
-  window->get_geometry(winx, winy, winw, winh, wind);
+  Gtk::Allocation allocation = get_allocation();
+  const int width = allocation.get_width();
+  const int height = allocation.get_height();
 
-  window->clear();
-
-
+  
   std::cout << "Player: " << m_game.get_player().get_name() << " in galaxy: " << m_game.get_player().get_location().first << " at planet: " << m_game.get_player().get_location().second << std::endl;
 
   exastris::Galaxy g(m_game.get_universe().get_galaxy(m_game.get_player().get_location().first));
 
+  Cairo::RefPtr<Cairo::Context> cr = window->create_cairo_context();
+
+  cr->scale(width, height);
+
+  cr->save();
+  cr->set_source_rgba(0.0,0.0,0.0, 0.9);  
+  cr->paint();
+
+
 
   for (int i = 0; i < g.num_planets(); ++i)
   {
-    // draw_arc( gc_, int filled, int x, int y, int width, int height, int angle1, int angle2)
-    // x :x coordinate of the left edge of the bounding rectangle 
-    // Y :y coordinate of the top edge of the bounding rectangle 
-    // width, height: width, height of the bounding rectangle 
-    // angle1: start angle of the arc relative to the 3 o'clock position counter-clockwise in 1/64 ths of a degree
-    // angle2: end angle of the arc relative to angle1 in 1/64 ths of a degree
     exastris::Planet p = g.get_planet(i);
-    Gdk::Color c;
-  //  c.set_rgb(p.m_planet_stats.m_red*10, p.m_planet_stats.m_green, p.m_planet_stats.m_blue);
-//    c.set_rgb_p(, 0, 0);
-    gc_->set_foreground(green_);
-    gc_->set_line_attributes(/*line_width*/0, 
-	/*LineStyle*/Gdk::LINE_SOLID,/*CapStyle*/Gdk::CAP_NOT_LAST,/*JoinStyle*/Gdk::JOIN_MITER);  
+    cr->set_source_rgba(p.m_planet_stats.m_red, p.m_planet_stats.m_green, p.m_planet_stats.m_blue, 1.0);
+    cr->arc(p.m_x, p.m_y, p.m_size, 0.0, 2 * M_PI);
+    cr->fill();
 
-    window->draw_arc(gc_, true, p.m_x-2, p.m_y-2, 5, 5, 0, 360*64);
   }
 
   exastris::Planet p(g.get_planet(m_game.get_player().get_location().second));
-  Gdk::Color c;
-  gc_->set_foreground(white_);
-  gc_->set_line_attributes(/*line_width*/1, 
-      /*LineStyle*/Gdk::LINE_SOLID,/*CapStyle*/Gdk::CAP_NOT_LAST,/*JoinStyle*/Gdk::JOIN_MITER);  
+  cr->set_line_width(0.01);
+  cr->set_source_rgba(1.0, 1.0, 1.0, .5);
 
-  int fuel = m_game.get_player().get_fuel_level();
-  window->draw_arc(gc_, false, p.m_x-(fuel/2), p.m_y-(fuel/2), fuel, fuel, 0, 360*64);
+  double fuel = m_game.get_player().get_fuel_level();
+  cr->arc(p.m_x, p.m_y, fuel, 0.0, 2 * M_PI);
+  cr->stroke();
 
 
   return true;
