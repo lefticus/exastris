@@ -11,18 +11,18 @@ namespace exastris
   class Universe
   {
     public:
-      Universe(int seed)
-	: m_initial_seed(seed),
-	  m_seed(seed),
-	  m_num_galaxies(random_scalar(random_generator(m_seed), 3, 10)),
-	  m_universe_modifier(get_seed(m_initial_seed, 1), .75, 1.25)
+      Universe(const Mersenne_Twister &mt)
+	: m_mersenne_twister(mt),
+	  m_num_galaxies(m_mersenne_twister.next(3, 10)),
+	  m_universe_modifier(m_mersenne_twister.indexed_sequence(1), .75, 1.25)
       {
       }
 
       Galaxy get_galaxy(int index) const
       {
 	assert(index < m_num_galaxies && index >= 0);
-        return Galaxy(get_seed(m_initial_seed, 2 + index), m_universe_modifier);
+        return Galaxy(m_mersenne_twister.indexed_sequence(index + 2), 
+	      m_universe_modifier);
       }
 
       int num_galaxies() const
@@ -33,16 +33,18 @@ namespace exastris
       Location random_location()
       {
         Location l;
-	l.first = round(random_scalar(random_generator(m_seed), 0, m_num_galaxies - 1));
-	l.second = round(random_scalar(random_generator(m_seed), 0, get_galaxy(l.first).num_planets() - 1));
+	l.first = m_mersenne_twister.next(0, 
+	      m_num_galaxies - 1);
+	l.second = m_mersenne_twister.next(0, 
+	      get_galaxy(l.first).num_planets() - 1);
 
 	return l;
       }
 
     private:
-      const unsigned int m_initial_seed;
-      unsigned int m_seed;
+      Mersenne_Twister m_mersenne_twister;
       const int m_num_galaxies;
+
 
       Planetary_Stats m_universe_modifier;
   };

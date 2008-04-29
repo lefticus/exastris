@@ -10,7 +10,7 @@ namespace exastris
   {
     public:
       Game(int t_seed, const std::string &t_player_name)
-	: m_universe(t_seed),
+	: m_universe(Mersenne_Twister(t_seed)),
           m_player(t_player_name, m_universe.random_location())
       {
       }

@@ -8,19 +8,20 @@ namespace exastris
   class Planetary_Stats
   {
     public:
-      Planetary_Stats(unsigned int seed, double min, double max)
-	: m_seed(seed),
-	  m_red(random_scalar(random_generator(m_seed), min, max)),
-	  m_green(random_scalar(random_generator(m_seed), min, max)),
-      	  m_blue(random_scalar(random_generator(m_seed), min, max)),
-      	  m_technology_level(random_scalar(random_generator(m_seed), min, max)),
-      	  m_governmental_control_level(random_scalar(random_generator(m_seed), min, max))
+      Planetary_Stats(const Mersenne_Twister &mt, double min, double max)
+	: m_mersenne_twister(mt),
+	  m_red(m_mersenne_twister.next(min, max)),
+	  m_green(m_mersenne_twister.next(min, max)),
+      	  m_blue(m_mersenne_twister.next(min, max)),
+      	  m_technology_level(m_mersenne_twister.next(min, max)),
+      	  m_governmental_control_level(m_mersenne_twister.next(min, max))
       {
       }
 
       Planetary_Stats operator*(const Planetary_Stats &ps)
       {
 	return Planetary_Stats(
+	    m_mersenne_twister,
 	    fit_range(ps.m_red * m_red, 0.0, 1.0),
 	    fit_range(ps.m_green * m_green, 0.0, 1.0),
 	    fit_range(ps.m_blue * m_blue, 0.0, 1.0),
@@ -29,6 +30,7 @@ namespace exastris
 	  );
       }
 
+      Mersenne_Twister m_mersenne_twister;
       unsigned int m_seed;
 
       const double m_red;
@@ -39,9 +41,11 @@ namespace exastris
       const double m_governmental_control_level;
 
     private:
-      Planetary_Stats(double t_red, double t_green, double t_blue,
+      Planetary_Stats(
+	  const Mersenne_Twister &mt,
+	  double t_red, double t_green, double t_blue,
 	  double t_technology_level, double t_governmental_control_level)
-	: m_seed(0),
+	: m_mersenne_twister(mt),
 	  m_red(t_red),
 	  m_green(t_green),
 	  m_blue(t_blue),
