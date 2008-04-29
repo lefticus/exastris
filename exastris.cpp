@@ -208,7 +208,7 @@ protected:
 Radar::Radar()
   : m_box0(/*homogeneous*/false, /*spacing*/5), m_box1(false, 5), m_box2(false, 5), m_box3(false, 5), 
     m_button2("Quit"), 
-    m_game(101, "Jameson"),
+    m_game(0, "Jameson"),
     m_sb(), 
     m_area(m_game)
 {

@@ -10,13 +10,13 @@ namespace exastris
   class Planet
   {
     public:
-      Planet(int seed, const Planetary_Stats &ps)
-	: m_initial_seed(seed),
-	  m_seed(seed),
-	  m_planet_stats(Planetary_Stats(get_seed(m_initial_seed, 0), 0.0, 1.0) * ps),
-	  m_x(random_scalar(random_generator(m_seed), 0.0, 1.0)),
-	  m_y(random_scalar(random_generator(m_seed), 0.0, 1.0)),
-	  m_size(random_scalar(random_generator(m_seed), .003, .005))
+      Planet(const Mersenne_Twister &mt, const Planetary_Stats &ps)
+	: m_mersenne_twister(mt),
+	  m_planet_stats(Planetary_Stats(
+		m_mersenne_twister.indexed_sequence(1), 0.0, 1.0) * ps),
+	  m_x(m_mersenne_twister.next(0.0, 1.0)),
+	  m_y(m_mersenne_twister.next(0.0, 1.0)),
+	  m_size(m_mersenne_twister.next(.003, .005))
       {
       }
 
@@ -25,8 +25,7 @@ namespace exastris
 	return sqrt( pow(fabs(p.m_x - m_x), 2) + pow(fabs(p.m_y - m_y), 2));
       }
 
-      const unsigned int m_initial_seed;
-      unsigned int m_seed;
+      Mersenne_Twister m_mersenne_twister;
 
       const Planetary_Stats m_planet_stats;
 
