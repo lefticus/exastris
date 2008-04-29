@@ -130,7 +130,14 @@ void PPI::on_realize()
 
 bool PPI::on_button_press_event(GdkEventButton*e)
 {
-  std::cout << "Button pressed: " << e->x << " " << e->y << std::endl;
+  Gtk::Allocation allocation = get_allocation();
+  const int width = allocation.get_width();
+  const int height = allocation.get_height();
+
+  double x = double(e->x)/double(width);
+  double y = double(e->y)/double(height);
+
+  std::cout << "Button pressed: " << x << " " << y << std::endl;
   return true;
 }
 
