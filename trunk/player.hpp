@@ -14,7 +14,8 @@ namespace exastris
 	: m_name(t_name),
           m_location(t_location),
 	  m_fuel_capacity(.1),
-	  m_fuel_level(.1)
+	  m_fuel_level(.1),
+	  m_money(10)
       {
       }
 
@@ -43,6 +44,11 @@ namespace exastris
 	m_fuel_level -= t_fuel;
       }
 
+      void fill_up()
+      {
+	m_fuel_level = m_fuel_capacity;
+      }
+
 
 
     private:
@@ -52,6 +58,7 @@ namespace exastris
       double m_fuel_capacity;
       double m_fuel_level;
 
+      int m_money;
   };
 }
 
