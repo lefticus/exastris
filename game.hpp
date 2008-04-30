@@ -25,6 +25,27 @@ namespace exastris
 	return m_universe;
       }
 
+      std::vector<std::pair<int, std::string> > get_current_actions()
+      {
+	std::vector<std::pair<int, std::string> > actions;
+	actions.push_back(std::make_pair(1, std::string("buy fuel")));
+	return actions;
+      }
+
+      void perform_action(int action_id)
+      {
+	if (action_id == 1)
+	{
+	  m_player.fill_up();
+	}
+      }
+
+
+      Galaxy get_current_galaxy()
+      {
+	return m_universe.get_galaxy(m_player.get_location().first);
+      }
+
       bool move_to(const Location &t_loc)
       {
 	Location curloc = m_player.get_location();
@@ -35,7 +56,7 @@ namespace exastris
 	  Planet curplanet = m_universe.get_galaxy(curloc.first).get_planet(curloc.second);
           Planet newplanet = m_universe.get_galaxy(t_loc.first).get_planet(t_loc.second);
 
-	  int distance = curplanet.distance(newplanet);
+	  double distance = curplanet.distance(newplanet);
 
 	  if (distance <= m_player.get_fuel_level())
 	  {

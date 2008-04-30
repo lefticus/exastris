@@ -9,6 +9,14 @@ namespace exastris
   class Galaxy
   {
     public:
+      struct No_Planet_Found : std::runtime_error
+      {
+	No_Planet_Found()
+	  : std::runtime_error("Invalid index or location for planet")
+	{
+	}
+      };
+
       Galaxy(const Mersenne_Twister &mt, const Planetary_Stats &ps)
 	: m_mersenne_twister(mt),
 	  m_num_planets(m_mersenne_twister.next(500, 1250)),
@@ -19,9 +27,26 @@ namespace exastris
 
       Planet get_planet(int index)
       {
-	assert(index < m_num_planets && index >= 0);
+	if (index >= m_num_planets || index < 0)
+	{
+	  throw No_Planet_Found();
+	}
         return Planet(m_mersenne_twister.indexed_sequence(2 + index), 
-	    m_galaxy_modifier);
+	    m_galaxy_modifier, index);
+      }
+
+      Planet get_planet(double x, double y)
+      {
+	for (int i = 0; i < m_num_planets; ++i)
+	{
+	  Planet p = get_planet(i);
+	  if (p.located_at(x, y))
+	  {
+	    return p;
+	  }
+	}
+
+	throw No_Planet_Found();
       }
 
       int num_planets()
