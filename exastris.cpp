@@ -164,6 +164,7 @@ protected:
   Gtk::VBox m_box2;
   Gtk::HBox m_box3; //empty box
 
+  Gtk::Entry m_entry;
   Gtk::Button m_button1;
   Gtk::Button m_button2;
   Gtk::ListViewText m_listviewtext;
@@ -171,16 +172,17 @@ protected:
   Gtk::Statusbar m_sb;
 
   PPI m_area;
-  std::vector<std::pair<int, std::string> > m_actions;
+  std::vector<exastris::Game::Action> m_actions;
 };
 
 
 Radar::Radar()
   : m_box0(/*homogeneous*/false, /*spacing*/5), m_box1(false, 5), m_box2(false, 5), m_box3(false, 5), 
+    m_entry(),
     m_button1("Select"), 
     m_button2("Quit"), 
     m_listviewtext(2),
-    m_game(0, "Jameson"),
+    m_game(0),
     m_sb(), 
     m_area(m_game)
 {
@@ -193,6 +195,7 @@ Radar::Radar()
 
 //  m_box2.pack_start(m_box3, /*Gtk::PackOptions*/Gtk::PACK_EXPAND_WIDGET, /*padding*/5);
   m_box2.pack_start(m_listviewtext, Gtk::PACK_EXPAND_WIDGET, 5);
+  m_box2.pack_start(m_entry, Gtk::PACK_SHRINK, 5);
   m_box2.pack_start(m_button1, Gtk::PACK_SHRINK, 5);
   m_box2.pack_start(m_button2, Gtk::PACK_SHRINK, 5);
   
@@ -210,6 +213,8 @@ Radar::Radar()
 
   set_border_width(10);
   add(m_box0);
+
+  on_game_changed();
   show_all();
 
 }
@@ -222,8 +227,18 @@ Radar::~Radar()
 void Radar::on_button1_clicked()
 {
   Gtk::ListViewText::SelectionList list = m_listviewtext.get_selected();
-  m_game.perform_action(m_actions[list.front()].first);
-  on_game_changed();
+  if (!list.empty())
+  {
+    exastris::Game::Action action = m_actions[list.front()];
+    try {
+      dynamic_cast<exastris::Game::Action::String &>(*action.m_type)
+	.m_value = m_entry.get_text();
+    } catch (std::bad_cast &)
+    {
+    }
+    m_game.perform_action(action);
+    on_game_changed();
+  }
 }
 
 void Radar::on_button2_clicked()
@@ -234,19 +249,19 @@ void Radar::on_button2_clicked()
 void Radar::on_game_changed()
 {
   m_area.queue_draw();
-  std::vector<std::pair<int, std::string> > options 
+  std::vector<exastris::Game::Action> options 
     = m_game.get_current_actions();
 
   m_actions = options;
 
   m_listviewtext.clear_items();
-  for (std::vector<std::pair<int, std::string> >::const_iterator itr =
+  for (std::vector<exastris::Game::Action>::const_iterator itr =
          options.begin();
        itr != options.end();
        ++itr)
   {
     guint row_number = m_listviewtext.append_text();
-    m_listviewtext.set_text(row_number, 0, itr->second);
+    m_listviewtext.set_text(row_number, 0, itr->m_name);
   } 
   
   std::cout << "game changed event" << std::endl;
