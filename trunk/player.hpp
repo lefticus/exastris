@@ -19,6 +19,11 @@ namespace exastris
       {
       }
 
+      void set_name(const std::string &s)
+      {
+	m_name = s;
+      }
+
       std::string get_name() const
       {
 	return m_name;

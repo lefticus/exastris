@@ -3,19 +3,172 @@
 
 #include "universe.hpp"
 #include "player.hpp"
+#include <boost/shared_ptr.hpp>
+#include <vector>
 
 namespace exastris
 {
   class Game
   {
     public:
-      Game(int t_seed, const std::string &t_player_name)
+      struct Action
+      {
+	struct InputType
+	{
+	  virtual ~InputType() {}
+	};
+
+	struct None : InputType
+	{
+	  virtual ~None() {}
+	};
+
+	struct String : InputType
+	{
+	  String(int t_minlength, int t_maxlength,
+	      const std::string &t_defaultvalue)
+	    : m_minlength(t_minlength),
+	      m_maxlength(t_maxlength),
+	      m_value(t_defaultvalue)
+	  {
+	  }
+
+	  const int m_minlength;
+	  const int m_maxlength;
+
+	  std::string m_value;
+
+	  virtual ~String() {}
+	};
+
+	template<typename T>
+	  struct Range : InputType
+	{
+	  Range(T t_minvalue, T t_maxvalue, T t_defaultvalue)
+	    : m_minvalue(t_minvalue),
+	      m_maxvalue(t_maxvalue),
+	      m_value(t_defaultvalue)
+	  {
+	  }
+
+	  const T m_minvalue;
+	  const T m_maxvalue;
+
+	  T m_value;
+
+	  virtual ~Range() {}
+	};
+
+	typedef Range<int> Integer;
+	typedef Range<double> Float;
+
+	template<typename T>
+	struct List : InputType
+	{
+	  List(const std::vector<T> t_possiblevalues,
+	      const T &t_defaultvalue)
+	    : m_possiblevalues(t_possiblevalues),
+	      m_value(t_defaultvalue)
+	  {
+	  }
+
+	  const std::vector<T> m_possiblevalues;
+	  T m_value;
+
+	  virtual ~List() {}
+	};
+
+	typedef List<std::string> StringEnumeration;
+
+	Action(const std::string &t_name,
+	    int t_id, 
+	    boost::shared_ptr<InputType> t_type)
+	  : m_name(t_name),
+	    m_id(t_id),
+	    m_type(t_type)
+	{
+	}
+
+
+	std::string m_name;
+	int m_id;
+	boost::shared_ptr<InputType> m_type;
+      };
+
+      struct State
+      {
+	State(Game &t_game)
+	  : m_game(t_game)
+	{
+	}
+
+	virtual boost::shared_ptr<State> perform_action(const Action &t_action) = 0;
+	virtual std::vector<Action> get_current_actions() = 0;
+
+
+	virtual ~State() {}
+
+	Game &m_game;
+      };
+
+      struct Begin_Game_State : State
+      {
+	Begin_Game_State(Game &t_game)
+	  : State(t_game)
+	{
+	}
+
+	virtual std::vector<Action> get_current_actions()
+	{
+	  std::vector<Action> actions;
+
+	  actions.push_back(
+	      Action("Create Character", 1,
+	      boost::shared_ptr<Action::InputType>(new Action::None())));
+
+	  return actions;
+	}
+
+	virtual boost::shared_ptr<State> perform_action(const Action &t_a)
+	{
+	  return boost::shared_ptr<State>(new Create_Character_State(m_game));
+	}
+      };
+
+      struct Create_Character_State : State
+      {
+	Create_Character_State(Game &t_game)
+	  : State(t_game)
+	{
+	}
+
+	virtual std::vector<Action> get_current_actions()
+	{
+	  std::vector<Action> actions;
+
+	  actions.push_back(
+	      Action("Change Name (" + m_game.get_player().get_name() + ")", 1,
+	      boost::shared_ptr<Action::InputType>(
+		new Action::String(2, 20, m_game.get_player().get_name()))));
+
+	  return actions;
+	}
+
+	virtual boost::shared_ptr<State> perform_action(const Action &t_a)
+	{
+	  m_game.get_player().set_name(dynamic_cast<const exastris::Game::Action::String &>(*t_a.m_type).m_value);
+	  return boost::shared_ptr<State>(new Create_Character_State(m_game));
+	}
+      };
+
+      Game(int t_seed)
 	: m_universe(Mersenne_Twister(t_seed)),
-          m_player(t_player_name, m_universe.random_location())
+          m_player("Jameson", m_universe.random_location()),
+	  m_current_state(new Begin_Game_State(*this))
       {
       }
 
-      const Player &get_player()
+      Player &get_player()
       {
 	return m_player;
       }
@@ -25,19 +178,15 @@ namespace exastris
 	return m_universe;
       }
 
-      std::vector<std::pair<int, std::string> > get_current_actions()
+      std::vector<Action> get_current_actions()
       {
-	std::vector<std::pair<int, std::string> > actions;
-	actions.push_back(std::make_pair(1, std::string("buy fuel")));
-	return actions;
+	return m_current_state->get_current_actions();
+
       }
 
-      void perform_action(int action_id)
+      void perform_action(const Action &a)
       {
-	if (action_id == 1)
-	{
-	  m_player.fill_up();
-	}
+        m_current_state = m_current_state->perform_action(a);
       }
 
 
@@ -73,6 +222,8 @@ namespace exastris
     private:
       Universe m_universe;
       Player m_player;
+
+      boost::shared_ptr<State> m_current_state;
   };
 }
 
