@@ -26,6 +26,7 @@
 
 #include <gtkmm/button.h>
 #include <gtkmm/box.h>
+#include <gtkmm/spinbutton.h>
 #include <gtkmm/statusbar.h>
 #include <gtkmm/listviewtext.h>
 #include <gtkmm/window.h>
@@ -157,7 +158,8 @@ protected:
   void on_button1_clicked();
   void on_button2_clicked();
   void on_game_changed();
-  
+  void on_cursor_changed();
+
   // Child widgets
   Gtk::VBox m_box0;
   Gtk::HBox m_box1;
@@ -165,6 +167,7 @@ protected:
   Gtk::HBox m_box3; //empty box
 
   Gtk::Entry m_entry;
+  Gtk::SpinButton m_spinbutton;
   Gtk::Button m_button1;
   Gtk::Button m_button2;
   Gtk::ListViewText m_listviewtext;
@@ -179,9 +182,10 @@ protected:
 Radar::Radar()
   : m_box0(/*homogeneous*/false, /*spacing*/5), m_box1(false, 5), m_box2(false, 5), m_box3(false, 5), 
     m_entry(),
+    m_spinbutton(),
     m_button1("Select"), 
     m_button2("Quit"), 
-    m_listviewtext(2),
+    m_listviewtext(1),
     m_game(0),
     m_sb(), 
     m_area(m_game)
@@ -193,9 +197,13 @@ Radar::Radar()
   m_button1.signal_clicked().connect(sigc::mem_fun(*this, &Radar::on_button1_clicked));
   m_area.signal_game_changed.connect(sigc::mem_fun(*this, &Radar::on_game_changed));
 
+  m_listviewtext.signal_cursor_changed().connect(sigc::mem_fun(*this, &Radar::on_cursor_changed));
+ 
+
 //  m_box2.pack_start(m_box3, /*Gtk::PackOptions*/Gtk::PACK_EXPAND_WIDGET, /*padding*/5);
   m_box2.pack_start(m_listviewtext, Gtk::PACK_EXPAND_WIDGET, 5);
   m_box2.pack_start(m_entry, Gtk::PACK_SHRINK, 5);
+  m_box2.pack_start(m_spinbutton, Gtk::PACK_SHRINK, 5);
   m_box2.pack_start(m_button1, Gtk::PACK_SHRINK, 5);
   m_box2.pack_start(m_button2, Gtk::PACK_SHRINK, 5);
   
@@ -217,6 +225,8 @@ Radar::Radar()
   on_game_changed();
   show_all();
 
+  m_entry.hide();
+  m_spinbutton.hide();
 }
 
 
@@ -224,18 +234,64 @@ Radar::~Radar()
 {
 }
 
+void Radar::on_cursor_changed()
+{
+  Gtk::ListViewText::SelectionList list = m_listviewtext.get_selected();
+  if (!list.empty())
+  {
+    std::cout << " new row selected: " << list.front() << std::endl;
+    exastris::Game::Action action = m_actions[list.front()];
+
+    exastris::Game::Action::String *stringtype(0);
+    exastris::Game::Action::Integer *inttype(0);
+
+    if ((stringtype = 
+	  dynamic_cast<exastris::Game::Action::String *>(action.m_type.get())))
+    {
+      m_entry.set_text(stringtype->m_value);
+      m_entry.set_max_length(stringtype->m_maxlength);
+      m_spinbutton.hide();
+      m_entry.show();
+    } else if ((inttype = 
+	  dynamic_cast<exastris::Game::Action::Integer *>(action.m_type.get())))
+    {
+      m_spinbutton.set_value(inttype->m_value);
+//      m_spinbutton.set_digits(0);
+
+      std::cout << "Setting range: " << inttype->m_minvalue << " " <<  inttype->m_maxvalue << std::endl;
+      m_spinbutton.set_numeric(true);
+      m_spinbutton.set_increments(1, 1);
+      m_spinbutton.set_range(inttype->m_minvalue, inttype->m_maxvalue);
+      m_spinbutton.show();
+      m_entry.hide();
+    } else {
+      m_entry.hide();
+      m_spinbutton.hide();
+    }
+  }
+}
+
+
+
 void Radar::on_button1_clicked()
 {
   Gtk::ListViewText::SelectionList list = m_listviewtext.get_selected();
   if (!list.empty())
   {
     exastris::Game::Action action = m_actions[list.front()];
-    try {
-      dynamic_cast<exastris::Game::Action::String &>(*action.m_type)
-	.m_value = m_entry.get_text();
-    } catch (std::bad_cast &)
+    exastris::Game::Action::String *stringtype(0);
+    exastris::Game::Action::Integer *inttype(0);
+
+    if ((stringtype = 
+	  dynamic_cast<exastris::Game::Action::String *>(action.m_type.get())))
+    { 
+      stringtype->m_value = m_entry.get_text();
+    } else if ((inttype = 
+	  dynamic_cast<exastris::Game::Action::Integer *>(action.m_type.get())))
     {
+      inttype->m_value = m_spinbutton.get_value_as_int();
     }
+
     m_game.perform_action(action);
     on_game_changed();
   }
@@ -264,8 +320,7 @@ void Radar::on_game_changed()
     m_listviewtext.set_text(row_number, 0, itr->m_name);
   } 
   
-  std::cout << "game changed event" << std::endl;
-  
+ 
 }
 
 int main(int argc, char** argv)

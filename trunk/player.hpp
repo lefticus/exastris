@@ -15,8 +15,19 @@ namespace exastris
           m_location(t_location),
 	  m_fuel_capacity(.1),
 	  m_fuel_level(.1),
-	  m_money(10)
+	  m_money(10),
+	  m_piloting(1)
       {
+      }
+
+      void set_piloting(int v)
+      {
+	m_piloting = v;
+      }
+
+      int get_piloting()
+      {
+	return m_piloting;
       }
 
       void set_name(const std::string &s)
@@ -64,6 +75,7 @@ namespace exastris
       double m_fuel_level;
 
       int m_money;
+      int m_piloting;
   };
 }
 
