@@ -1,0 +1,7 @@
+#State of game play for selling purchased goods
+
+== Sell Goods State ==
+
+  # Sell Ore -> SellGoodsState
+  # Sell Steel -> SellGoodsState
+  # Back -> OnPlanetState
