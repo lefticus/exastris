@@ -1,0 +1,4 @@
+= Start Game State =
+
+  # Create Character -> CreateCharacterState
+
