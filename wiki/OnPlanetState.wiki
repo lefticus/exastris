@@ -1,4 +1,5 @@
 == On Planet State ==
 
-  # Trade Goods -> TradingGoodsState
+  # Buy Goods -> BuyGoodsState
+  # Sell Goods -> SellGoodsState
   # Shipyard -> ShipYardState
