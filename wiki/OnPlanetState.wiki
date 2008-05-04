@@ -1,0 +1,4 @@
+== On Planet State ==
+
+  # Trade Goods -> TradingGoodsState
+  # Shipyard -> ShipYardState
