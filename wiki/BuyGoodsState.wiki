@@ -1,6 +1,6 @@
 #summary One-sentence summary of this page.
 
-== Trading Goods State ==
+== Buy Goods State ==
 
   # Buy Ore -> BuyGoodsState
   # Buy Steel -> BuyGoodsState
