@@ -1,0 +1,8 @@
+#summary One-sentence summary of this page.
+
+== Ship Yard State ==
+
+  # Buy Ship Upgrades -> BuyShipUpgradesState
+  # Sell Ship Upgrades -> SellShipUpgradesState
+  # Buy Fuel -> ShipYardState
+  # Back -> OnPlanetState
