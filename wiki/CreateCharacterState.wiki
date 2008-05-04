@@ -1,0 +1,9 @@
+
+== Create Character State ==
+
+  # Set Name -> CreateCharacterState
+  # Set Piloting Skill Level -> CreateCharacterState
+  # Set Weaponry Skill Level -> CreateCharacterState
+  # Set Negotiation Skill Level -> CreateCharacterState
+  # Set Engineering Skill Level -> CreateCharacterState
+  # Start Game -> OnPlanetState
