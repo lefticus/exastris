@@ -151,12 +151,27 @@ namespace exastris
 	      boost::shared_ptr<Action::InputType>(
 		new Action::String(2, 20, m_game.get_player().get_name()))));
 
+	  actions.push_back(
+	      Action("Set Piloting", 2,
+	      boost::shared_ptr<Action::InputType>(
+		new Action::Integer(1, 10, m_game.get_player().get_piloting()))));
+
 	  return actions;
 	}
 
 	virtual boost::shared_ptr<State> perform_action(const Action &t_a)
 	{
-	  m_game.get_player().set_name(dynamic_cast<const exastris::Game::Action::String &>(*t_a.m_type).m_value);
+	  switch (t_a.m_id)
+	  {
+	    case 1:
+	      m_game.get_player().set_name(dynamic_cast<const exastris::Game::Action::String &>(*t_a.m_type).m_value);
+	      break;
+	    case 2:
+	      m_game.get_player().set_piloting(dynamic_cast<const exastris::Game::Action::Integer &>(*t_a.m_type).m_value);
+	      break;
+	  };
+
+	  
 	  return boost::shared_ptr<State>(new Create_Character_State(m_game));
 	}
       };
