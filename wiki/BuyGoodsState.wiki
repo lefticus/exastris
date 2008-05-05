@@ -1,4 +1,4 @@
-#State of purchasing goods for sale
+#state of purchasing goods for sale
 
 == Buy Goods State ==
 
