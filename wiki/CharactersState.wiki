@@ -1,0 +1,8 @@
+#summary One-sentence summary of this page.
+
+== Character Interaction State ==
+
+Dynamic list of characters available to chat with. Both those on planet and those on board ship.
+
+  # Talk to <Character Name> -> TalkToCharacterState
+  # Back -> OnPlanetState
