@@ -1,7 +1,8 @@
-#summary One-sentence summary of this page.
+#State of purchasing goods for sale
 
 == Buy Goods State ==
 
-  # Buy Ore -> BuyGoodsState
-  # Buy Steel -> BuyGoodsState
+Dynamic list of available goods.
+
+  # Buy <Item> (Amount Purchasble) -> BuyGoodsState
   # Back -> OnPlanetState
