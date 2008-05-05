@@ -2,6 +2,7 @@
 
 == Sell Goods State ==
 
-  # Sell Ore -> SellGoodsState
-  # Sell Steel -> SellGoodsState
+Dynamic list of goods for sell
+
+  # Sell <item> (Amount Available to Sell, Relative Price) -> SellGoodsState
   # Back -> OnPlanetState
