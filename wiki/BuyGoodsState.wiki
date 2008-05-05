@@ -1,5 +1,6 @@
-= Buy Goods State =
-#state of purchasing goods for sale
+#summary state of purchasing goods for sale
+
+== Buy Goods State ==
 
 Dynamic list of available goods.
 
