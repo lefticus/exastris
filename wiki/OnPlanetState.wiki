@@ -3,3 +3,5 @@
   # Buy Goods -> BuyGoodsState
   # Sell Goods -> SellGoodsState
   # Shipyard -> ShipYardState
+  # Warp -> WarpListState
+  # Characters -> CharactersState
