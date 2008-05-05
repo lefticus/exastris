@@ -1,0 +1,11 @@
+#summary One-sentence summary of this page.
+
+== Warp List State ==
+
+Dynamically generated list of goods that selected planet accepts
+
+  # Next Planet in Range -> WarpListState
+  # Previous Planet in Range -> WarpListState
+  # Buy <item> (Relative Price, Number available to Purchase) -> WarpListState
+  # Warp To Planet -> InWarpState
+  # Back -> OnPlanetState
