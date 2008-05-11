@@ -3,6 +3,7 @@
 
 #include "planet.hpp"
 #include <cassert>
+#include <stdexcept>
 
 namespace exastris
 {

@@ -2,6 +2,7 @@
 #define __random_generator_hpp__
 
 #include <cstdlib>
+#include <cmath>
 #include <algorithm>
 
 namespace exastris
