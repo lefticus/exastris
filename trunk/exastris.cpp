@@ -170,6 +170,7 @@ protected:
   Gtk::SpinButton m_spinbutton;
   Gtk::Button m_button1;
   Gtk::Button m_button2;
+  Gtk::Label m_label;
   Gtk::ListViewText m_listviewtext;
   exastris::Game m_game;
   Gtk::Statusbar m_sb;
@@ -185,7 +186,8 @@ Radar::Radar()
     m_spinbutton(),
     m_button1("Select"), 
     m_button2("Quit"), 
-    m_listviewtext(1),
+    m_label(),
+    m_listviewtext(2),
     m_game(0),
     m_sb(), 
     m_area(m_game)
@@ -200,6 +202,7 @@ Radar::Radar()
   m_listviewtext.signal_cursor_changed().connect(sigc::mem_fun(*this, &Radar::on_cursor_changed));
  
 
+  m_box2.pack_start(m_label, Gtk::PACK_SHRINK, 5);
 //  m_box2.pack_start(m_box3, /*Gtk::PackOptions*/Gtk::PACK_EXPAND_WIDGET, /*padding*/5);
   m_box2.pack_start(m_listviewtext, Gtk::PACK_EXPAND_WIDGET, 5);
   m_box2.pack_start(m_entry, Gtk::PACK_SHRINK, 5);
@@ -209,7 +212,7 @@ Radar::Radar()
   
   // box1
   m_area.set_size_request(300, 300);
-  m_listviewtext.set_size_request(200, 100);
+  m_listviewtext.set_size_request(300, 100);
   m_box1.pack_start(m_area, Gtk::PACK_EXPAND_WIDGET, 5);
   m_box1.pack_start(m_box2, Gtk::PACK_SHRINK, 5);
     
@@ -218,6 +221,7 @@ Radar::Radar()
   m_box0.pack_start(m_sb, Gtk::PACK_SHRINK, 5);
  
   m_listviewtext.set_column_title(0, "Action");
+  m_listviewtext.set_column_title(1, "Current Value");
 
   set_border_width(10);
   add(m_box0);
@@ -255,13 +259,11 @@ void Radar::on_cursor_changed()
     } else if ((inttype = 
 	  dynamic_cast<exastris::Game::Action::Integer *>(action.m_type.get())))
     {
-      m_spinbutton.set_value(inttype->m_value);
-//      m_spinbutton.set_digits(0);
-
       std::cout << "Setting range: " << inttype->m_minvalue << " " <<  inttype->m_maxvalue << std::endl;
       m_spinbutton.set_numeric(true);
       m_spinbutton.set_increments(1, 1);
       m_spinbutton.set_range(inttype->m_minvalue, inttype->m_maxvalue);
+      m_spinbutton.set_value(inttype->m_value);
       m_spinbutton.show();
       m_entry.hide();
     } else {
@@ -318,8 +320,10 @@ void Radar::on_game_changed()
   {
     guint row_number = m_listviewtext.append_text();
     m_listviewtext.set_text(row_number, 0, itr->m_name);
+    m_listviewtext.set_text(row_number, 1, itr->value_as_string());
   } 
   
+  m_label.set_text(m_game.get_current_state_description());
  
 }
 
