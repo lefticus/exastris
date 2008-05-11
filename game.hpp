@@ -15,11 +15,13 @@ namespace exastris
       {
 	struct InputType
 	{
+          virtual std::string value_as_string() const = 0;
 	  virtual ~InputType() {}
 	};
 
 	struct None : InputType
 	{
+	  virtual std::string value_as_string() const { return ""; }
 	  virtual ~None() {}
 	};
 
@@ -33,6 +35,7 @@ namespace exastris
 	  {
 	  }
 
+	  virtual std::string value_as_string() const { return m_value; }
 	  const int m_minlength;
 	  const int m_maxlength;
 
@@ -49,6 +52,13 @@ namespace exastris
 	      m_maxvalue(t_maxvalue),
 	      m_value(t_defaultvalue)
 	  {
+	  }
+
+	  virtual std::string value_as_string() const
+	  { 
+	    std::stringstream ss;
+	    ss << m_value; 
+	    return ss.str();
 	  }
 
 	  const T m_minvalue;
@@ -72,6 +82,13 @@ namespace exastris
 	  {
 	  }
 
+	  virtual std::string value_as_string() const
+	  { 
+	    std::stringstream ss;
+	    ss << m_value; 
+	    return ss.str();
+	  }
+
 	  const std::vector<T> m_possiblevalues;
 	  T m_value;
 
@@ -92,13 +109,18 @@ namespace exastris
 
 	std::string m_name;
 	int m_id;
+	std::string value_as_string() const
+	{
+	  return m_type->value_as_string();
+	}
 	boost::shared_ptr<InputType> m_type;
       };
 
       struct State
       {
-	State(Game &t_game)
-	  : m_game(t_game)
+	State(Game &t_game, const std::string &t_description)
+	  : m_game(t_game),
+	    m_description(t_description)
 	{
 	}
 
@@ -109,12 +131,26 @@ namespace exastris
 	virtual ~State() {}
 
 	Game &m_game;
+
+	std::string get_description()
+	{
+	  return m_description;
+	}
+
+	void set_description(const std::string &t_desc)
+	{
+	  m_description = t_desc;
+	}
+
+	private:
+
+	std::string m_description;
       };
 
       struct Begin_Game_State : State
       {
 	Begin_Game_State(Game &t_game)
-	  : State(t_game)
+	  : State(t_game, "Begin Game")
 	{
 	}
 
@@ -138,7 +174,7 @@ namespace exastris
       struct Create_Character_State : State
       {
 	Create_Character_State(Game &t_game)
-	  : State(t_game)
+	  : State(t_game, "Create Character")
 	{
 	}
 
@@ -147,14 +183,33 @@ namespace exastris
 	  std::vector<Action> actions;
 
 	  actions.push_back(
-	      Action("Change Name (" + m_game.get_player().get_name() + ")", 1,
+	      Action("Name", 1,
 	      boost::shared_ptr<Action::InputType>(
 		new Action::String(2, 20, m_game.get_player().get_name()))));
 
-	  actions.push_back(
-	      Action("Set Piloting", 2,
-	      boost::shared_ptr<Action::InputType>(
-		new Action::Integer(1, 10, m_game.get_player().get_piloting()))));
+
+	  std::vector<std::pair<std::string, double> > values
+	    = m_game.get_player().get_stats().get_values();
+
+
+	  int total = 0;
+
+	  for (unsigned int i = 0; i < values.size(); ++i)
+	  {
+	    total += round(values[i].second * 100);
+	  }
+
+	  std::stringstream ss;
+	  ss << "Create Character (" << 100-total << " points available)";
+	  set_description(ss.str());
+
+	  for (unsigned int i = 0; i < values.size(); ++i)
+	  {
+	    actions.push_back(
+		Action(values[i].first, i + 2,
+		  boost::shared_ptr<Action::InputType>(
+		    new Action::Integer(1, round(100-(total-(values[i].second*100))), round(values[i].second * 100)))));
+	  }
 
 	  return actions;
 	}
@@ -166,8 +221,9 @@ namespace exastris
 	    case 1:
 	      m_game.get_player().set_name(dynamic_cast<const exastris::Game::Action::String &>(*t_a.m_type).m_value);
 	      break;
-	    case 2:
-	      m_game.get_player().set_piloting(dynamic_cast<const exastris::Game::Action::Integer &>(*t_a.m_type).m_value);
+	    default:
+	      m_game.get_player().get_stats()[m_game.get_player().get_stats().get_names()[t_a.m_id-2]] 
+		= double(dynamic_cast<const exastris::Game::Action::Integer &>(*t_a.m_type).m_value)/100;
 	      break;
 	  };
 
@@ -197,6 +253,11 @@ namespace exastris
       {
 	return m_current_state->get_current_actions();
 
+      }
+
+      std::string get_current_state_description()
+      {
+	return m_current_state->get_description();
       }
 
       void perform_action(const Action &a)
