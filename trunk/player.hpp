@@ -1,8 +1,10 @@
-#ifndef __player_hp__
-#define __player_hp__
+#ifndef __player_hpp__
+#define __player_hpp__
 
 #include "universe.hpp"
 #include <string>
+#include <map>
+#include <vector>
 
 namespace exastris
 {

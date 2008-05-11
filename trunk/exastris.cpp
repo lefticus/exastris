@@ -176,7 +176,7 @@ protected:
   Gtk::Statusbar m_sb;
 
   PPI m_area;
-  std::vector<exastris::Game::Action> m_actions;
+  std::vector<exastris::Action> m_actions;
 };
 
 
@@ -244,20 +244,20 @@ void Radar::on_cursor_changed()
   if (!list.empty())
   {
     std::cout << " new row selected: " << list.front() << std::endl;
-    exastris::Game::Action action = m_actions[list.front()];
+    exastris::Action action = m_actions[list.front()];
 
-    exastris::Game::Action::String *stringtype(0);
-    exastris::Game::Action::Integer *inttype(0);
+    exastris::Action::String *stringtype(0);
+    exastris::Action::Integer *inttype(0);
 
     if ((stringtype = 
-	  dynamic_cast<exastris::Game::Action::String *>(action.m_type.get())))
+	  dynamic_cast<exastris::Action::String *>(action.m_type.get())))
     {
       m_entry.set_text(stringtype->m_value);
       m_entry.set_max_length(stringtype->m_maxlength);
       m_spinbutton.hide();
       m_entry.show();
     } else if ((inttype = 
-	  dynamic_cast<exastris::Game::Action::Integer *>(action.m_type.get())))
+	  dynamic_cast<exastris::Action::Integer *>(action.m_type.get())))
     {
       std::cout << "Setting range: " << inttype->m_minvalue << " " <<  inttype->m_maxvalue << std::endl;
       m_spinbutton.set_numeric(true);
@@ -280,16 +280,16 @@ void Radar::on_button1_clicked()
   Gtk::ListViewText::SelectionList list = m_listviewtext.get_selected();
   if (!list.empty())
   {
-    exastris::Game::Action action = m_actions[list.front()];
-    exastris::Game::Action::String *stringtype(0);
-    exastris::Game::Action::Integer *inttype(0);
+    exastris::Action action = m_actions[list.front()];
+    exastris::Action::String *stringtype(0);
+    exastris::Action::Integer *inttype(0);
 
     if ((stringtype = 
-	  dynamic_cast<exastris::Game::Action::String *>(action.m_type.get())))
+	  dynamic_cast<exastris::Action::String *>(action.m_type.get())))
     { 
       stringtype->m_value = m_entry.get_text();
     } else if ((inttype = 
-	  dynamic_cast<exastris::Game::Action::Integer *>(action.m_type.get())))
+	  dynamic_cast<exastris::Action::Integer *>(action.m_type.get())))
     {
       inttype->m_value = m_spinbutton.get_value_as_int();
     }
@@ -307,13 +307,13 @@ void Radar::on_button2_clicked()
 void Radar::on_game_changed()
 {
   m_area.queue_draw();
-  std::vector<exastris::Game::Action> options 
+  std::vector<exastris::Action> options 
     = m_game.get_current_actions();
 
   m_actions = options;
 
   m_listviewtext.clear_items();
-  for (std::vector<exastris::Game::Action>::const_iterator itr =
+  for (std::vector<exastris::Action>::const_iterator itr =
          options.begin();
        itr != options.end();
        ++itr)
