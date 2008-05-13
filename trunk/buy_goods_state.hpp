@@ -22,8 +22,24 @@ namespace exastris
       std::vector<Action> actions;
 
       actions.push_back(
-	  Action("Back", 1, boost::shared_ptr<Action::InputType>
+	  Action("Back", 0, boost::shared_ptr<Action::InputType>
 	    (new Action::None())));
+
+      std::vector<Ware_For_Sale> wares = m_game.get_wares_for_sale();
+
+      int i = 1;
+      for (std::vector<Ware_For_Sale>::const_iterator itr = wares.begin();
+	   itr != wares.end();
+	   ++itr, ++i)
+      {
+	std::stringstream desc;
+	desc << itr->m_name << " (" << itr->m_price_per_unit << " ea)";
+	actions.push_back(
+	    Action(desc.str(), i,
+	      boost::shared_ptr<Action::InputType>(
+		new Action::Integer(0, itr->m_quantity_available,
+		  itr->m_quantity_available))));
+      }
 
       return actions;
     }
@@ -32,7 +48,7 @@ namespace exastris
     {
       switch (t_a.m_id)
       {
-	case 1:
+	case 0:
 	  return boost::shared_ptr<State>(new On_Planet_State(m_game));
 	  break;
 	default:

@@ -3,6 +3,7 @@
 
 #include "universe.hpp"
 #include "player.hpp"
+#include "wares.hpp"
 #include <boost/shared_ptr.hpp>
 #include <vector>
 #include <sstream>
@@ -149,7 +150,6 @@ namespace exastris
   };
 
 
-
   class Game
   {
     public:
@@ -165,6 +165,10 @@ namespace exastris
 
       Galaxy get_current_galaxy();
       bool move_to(const Location &t_loc);
+
+      std::vector<Ware_For_Sale> get_wares_for_sale();
+      std::vector<Ware_For_Purchase> get_wares_for_purchase();
+
 
     private:
       Universe m_universe;

@@ -2,6 +2,7 @@
 #define __player_hpp__
 
 #include "universe.hpp"
+#include "wares.hpp"
 #include <string>
 #include <map>
 #include <vector>
@@ -11,6 +12,12 @@ namespace exastris
   class Player
   {
     public:
+      struct Ware
+      {
+        double m_average_cost;
+        int m_quantity;
+      };
+
       class Stats
       {
 	private:
@@ -106,6 +113,22 @@ namespace exastris
 	m_location = t_loc;
       }
 
+      void purchase_wares(const Ware_For_Sale &t_wfs, int quantity)
+      {
+	Ware &ware = m_wares[t_wfs.m_name];
+
+	assert(quantity <= t_wfs.m_quantity_available);
+        assert(t_wfs.m_price_per_unit * quantity <= m_money);
+
+	m_money -= t_wfs.m_price_per_unit * quantity;
+
+	ware.m_average_cost = ((ware.m_average_cost * ware.m_quantity) + (t_wfs.m_price_per_unit * quantity))/(ware.m_quantity + quantity);
+
+	ware.m_quantity += quantity;
+
+
+      }
+
       double get_fuel_level() const
       {
 	return m_fuel_level;
@@ -114,11 +137,6 @@ namespace exastris
       void use_fuel(double t_fuel)
       {
 	m_fuel_level -= t_fuel;
-      }
-
-      void fill_up()
-      {
-	m_fuel_level = m_fuel_capacity;
       }
 
       Stats &get_stats()
@@ -140,7 +158,9 @@ namespace exastris
       double m_fuel_capacity;
       double m_fuel_level;
 
-      int m_money;
+      double m_money;
+
+      std::map<std::string, Ware> m_wares;
 
       Stats m_stats;
   };

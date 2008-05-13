@@ -41,6 +41,20 @@ namespace exastris
     m_current_state = m_current_state->perform_action(a);
   }
 
+  std::vector<Ware_For_Sale> Game::get_wares_for_sale()
+  {
+    std::vector<Ware_For_Sale> wares;
+    wares.push_back(Ware_For_Sale("Ore", .99, 5));
+    return wares;
+  }
+
+  std::vector<Ware_For_Purchase> Game::get_wares_for_purchase()
+  {
+    std::vector<Ware_For_Purchase> wares;
+    wares.push_back(Ware_For_Purchase("Ore", .99, .98, 5));
+    return wares;
+  }
+
 
   Galaxy Game::get_current_galaxy()
   {
