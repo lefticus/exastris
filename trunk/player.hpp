@@ -149,6 +149,11 @@ namespace exastris
 	return m_stats;
       }
 
+      double get_money() const
+      {
+	return m_money;
+      }
+
 
 
     private:

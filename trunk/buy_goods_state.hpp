@@ -21,24 +21,34 @@ namespace exastris
     {
       std::vector<Action> actions;
 
+      std::stringstream ss;
+      ss << "Buy Goods (" << m_game.get_player().get_money() << " credits available)";
+      set_description(ss.str());
+
+
       actions.push_back(
-	  Action("Back", 0, boost::shared_ptr<Action::InputType>
+	  Action("Back", -1, boost::shared_ptr<Action::InputType>
 	    (new Action::None())));
 
-      std::vector<Ware_For_Sale> wares = m_game.get_wares_for_sale();
+      m_wares = m_game.get_wares_for_sale();
 
-      int i = 1;
-      for (std::vector<Ware_For_Sale>::const_iterator itr = wares.begin();
-	   itr != wares.end();
+      int i = 0;
+      for (std::vector<Ware_For_Sale>::const_iterator itr = m_wares.begin();
+	   itr != m_wares.end();
 	   ++itr, ++i)
       {
 	std::stringstream desc;
 	desc << itr->m_name << " (" << itr->m_price_per_unit << " ea)";
+
+	int number_which_can_be_purchased=
+	  std::min(itr->m_quantity_available,
+	      int(m_game.get_player().get_money()/itr->m_price_per_unit));
+
 	actions.push_back(
 	    Action(desc.str(), i,
 	      boost::shared_ptr<Action::InputType>(
-		new Action::Integer(0, itr->m_quantity_available,
-		  itr->m_quantity_available))));
+		new Action::Integer(0, number_which_can_be_purchased,
+		  number_which_can_be_purchased))));
       }
 
       return actions;
@@ -48,13 +58,19 @@ namespace exastris
     {
       switch (t_a.m_id)
       {
-	case 0:
+	case -1:
 	  return boost::shared_ptr<State>(new On_Planet_State(m_game));
 	  break;
 	default:
-	  return boost::shared_ptr<State>(new On_Planet_State(m_game));
+	  m_game.get_player().purchase_wares(
+	      m_wares[t_a.m_id],
+	    dynamic_cast<const exastris::Action::Integer &>(*t_a.m_type).m_value);
+	  return boost::shared_ptr<State>(new Buy_Goods_State(m_game));
       };
     }
+
+    private:
+      std::vector<Ware_For_Sale> m_wares;
   };
 }
 
