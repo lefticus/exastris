@@ -51,7 +51,18 @@ namespace exastris
   std::vector<Ware_For_Purchase> Game::get_wares_for_purchase()
   {
     std::vector<Ware_For_Purchase> wares;
-    wares.push_back(Ware_For_Purchase("Ore", .99, .98, 5));
+    typedef std::vector<std::pair<std::string, Player::Ware> > Player_Wares;
+
+    Player_Wares pwares = m_player.get_owned_wares();
+
+    for (Player_Wares::const_iterator itr = pwares.begin();
+	 itr != pwares.end();
+	 ++itr)
+    {
+      wares.push_back(Ware_For_Purchase(itr->first,
+	    .98, itr->second.m_average_cost, itr->second.m_quantity));
+    }
+
     return wares;
   }
 
