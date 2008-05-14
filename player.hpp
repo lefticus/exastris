@@ -113,6 +113,18 @@ namespace exastris
 	m_location = t_loc;
       }
 
+      void sell_wares(const Ware_For_Purchase &t_wfp, int quantity)
+      {
+	std::map<std::string, Ware>::iterator itr = 
+	  m_wares.find(t_wfp.m_name);
+
+	assert(itr != m_wares.end());
+	assert(itr->second.m_quantity >= quantity);
+	
+	m_money += t_wfp.m_price_per_unit * quantity;
+	itr->second.m_quantity -= quantity;
+      }
+
       void purchase_wares(const Ware_For_Sale &t_wfs, int quantity)
       {
 	Ware &ware = m_wares[t_wfs.m_name];
@@ -125,13 +137,17 @@ namespace exastris
 	ware.m_average_cost = ((ware.m_average_cost * ware.m_quantity) + (t_wfs.m_price_per_unit * quantity))/(ware.m_quantity + quantity);
 
 	ware.m_quantity += quantity;
-
-
       }
 
       double get_fuel_level() const
       {
 	return m_fuel_level;
+      }
+
+      std::vector<std::pair<std::string, Ware> > get_owned_wares()
+      {
+	return std::vector<std::pair<std::string, Ware> >
+	  (m_wares.begin(), m_wares.end());
       }
 
       void use_fuel(double t_fuel)

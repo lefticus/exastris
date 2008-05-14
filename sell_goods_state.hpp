@@ -20,8 +20,25 @@ namespace exastris
       std::vector<Action> actions;
 
       actions.push_back(
-	  Action("Back", 1, boost::shared_ptr<Action::InputType>
+	  Action("Back", -1, boost::shared_ptr<Action::InputType>
 	    (new Action::None())));
+
+      m_wares = m_game.get_wares_for_purchase();
+
+      int i = 0;
+      for (std::vector<Ware_For_Purchase>::const_iterator itr = m_wares.begin();
+	   itr != m_wares.end();
+	   ++itr, ++i)
+      {
+	std::stringstream desc;
+	desc << itr->m_name << " (" << itr->m_price_per_unit - itr->m_price_paid_per_unit << " ea)";
+
+	actions.push_back(
+	    Action(desc.str(), i,
+	      boost::shared_ptr<Action::InputType>(
+		new Action::Integer(0, itr->m_quantity_available,
+		  itr->m_quantity_available))));
+      }
 
       return actions;
     }
@@ -30,13 +47,19 @@ namespace exastris
     {
       switch (t_a.m_id)
       {
-	case 1:
+	case -1:
 	  return boost::shared_ptr<State>(new On_Planet_State(m_game));
 	  break;
 	default:
-	  return boost::shared_ptr<State>(new On_Planet_State(m_game));
+	  m_game.get_player().sell_wares(
+	      m_wares[t_a.m_id],
+	      dynamic_cast<const exastris::Action::Integer &>(*t_a.m_type).m_value);
+	  return boost::shared_ptr<State>(new Sell_Goods_State(m_game));
       };
     }
+
+    private:
+      std::vector<Ware_For_Purchase> m_wares;
   };
 }
 
