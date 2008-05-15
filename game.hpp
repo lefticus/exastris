@@ -170,11 +170,15 @@ namespace exastris
       std::vector<Ware_For_Sale> get_wares_for_sale();
       std::vector<Ware_For_Purchase> get_wares_for_purchase();
 
+      Planet get_selected_planet();
+      void set_selected_planet(const Location &t_loc);
+
       std::vector<std::pair<double, Location> > get_planets_in_range();
 
     private:
       Universe m_universe;
       Player m_player;
+      Location m_selected_planet;
 
       boost::shared_ptr<State> m_current_state;
   };

@@ -14,12 +14,14 @@ namespace exastris
       : State(t_game, "Warp"),
         m_planets_in_range(t_game.get_planets_in_range())
     {
+      t_game.set_selected_planet(m_planets_in_range[0].second);
     }
 
     Warp_State(Game &t_game, const std::vector<std::pair<double, Location> > &t_loc)
       : State(t_game, "Warp"),
         m_planets_in_range(t_loc)
     {
+      t_game.set_selected_planet(m_planets_in_range[0].second);
     }
 
     virtual std::vector<Action> get_current_actions()
