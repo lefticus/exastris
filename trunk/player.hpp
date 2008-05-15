@@ -144,6 +144,11 @@ namespace exastris
 	return m_fuel_level;
       }
 
+      double distance_able_to_travel() const
+      {
+	return m_fuel_level;
+      }
+
       std::vector<std::pair<std::string, Ware> > get_owned_wares()
       {
 	return std::vector<std::pair<std::string, Ware> >
