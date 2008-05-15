@@ -109,6 +109,20 @@ bool PPI::on_expose_event(GdkEventExpose*)
   const int width = allocation.get_width();
   const int height = allocation.get_height();
 
+  double displayedwidth;
+  double displayedheight;
+
+  double range = m_game.get_player().get_fuel_level();
+  double displayedrange = range * 3.5;
+
+  if (width < height)
+  {
+    displayedwidth = displayedrange;
+    displayedheight = displayedrange*height/width;
+  } else {
+    displayedheight = displayedrange;
+    displayedwidth = displayedrange*width/height;
+  }
   
   std::cout << "Player: " << m_game.get_player().get_name() << " in galaxy: " << m_game.get_player().get_location().first << " at planet: " << m_game.get_player().get_location().second << std::endl;
 
@@ -116,7 +130,11 @@ bool PPI::on_expose_event(GdkEventExpose*)
 
   Cairo::RefPtr<Cairo::Context> cr = window->create_cairo_context();
 
-  cr->scale(width, height);
+  exastris::Planet p(g.get_planet(m_game.get_player().get_location().second));
+
+//  cr->scale(width, height);
+    cr->scale(double(width)/displayedwidth, double(height)/displayedheight);
+    cr->translate(-p.m_x + (displayedwidth/2), -p.m_y + (displayedheight/2));
 
   cr->save();
   cr->set_source_rgba(0.0,0.0,0.0, 0.9);  
@@ -133,13 +151,21 @@ bool PPI::on_expose_event(GdkEventExpose*)
 
   }
 
-  exastris::Planet p(g.get_planet(m_game.get_player().get_location().second));
-  cr->set_line_width(0.01);
+  cr->set_line_width(0.003);
   cr->set_source_rgba(1.0, 1.0, 1.0, .5);
 
-  double fuel = m_game.get_player().get_fuel_level();
-  cr->arc(p.m_x, p.m_y, fuel, 0.0, 2 * M_PI);
+  cr->arc(p.m_x, p.m_y, range, 0.0, 2 * M_PI);
   cr->stroke();
+
+  exastris::Planet selectedp = m_game.get_selected_planet();
+  cr->set_line_width(0.002);
+
+  cr->arc(selectedp.m_x, selectedp.m_y, 
+      selectedp.m_size + cr->get_line_width() / 2, 0.0, 2*M_PI);
+
+  cr->set_source_rgba(1.0, 1.0, 0.0, .75);
+  cr->stroke();
+
 
 
   return true;
@@ -249,12 +275,14 @@ void Radar::on_cursor_changed()
     exastris::Action::String *stringtype(0);
     exastris::Action::Integer *inttype(0);
 
+    m_entry.hide();
+    m_spinbutton.hide();
+
     if ((stringtype = 
 	  dynamic_cast<exastris::Action::String *>(action.m_type.get())))
     {
       m_entry.set_text(stringtype->m_value);
       m_entry.set_max_length(stringtype->m_maxlength);
-      m_spinbutton.hide();
       m_entry.show();
     } else if ((inttype = 
 	  dynamic_cast<exastris::Action::Integer *>(action.m_type.get())))
@@ -265,10 +293,8 @@ void Radar::on_cursor_changed()
       m_spinbutton.set_range(inttype->m_minvalue, inttype->m_maxvalue);
       m_spinbutton.set_value(inttype->m_value);
       m_spinbutton.show();
-      m_entry.hide();
-    } else {
-      m_entry.hide();
-      m_spinbutton.hide();
+    } else if ((dynamic_cast<exastris::Action::None *>(action.m_type.get()))) {
+      on_button1_clicked();
     }
   }
 }

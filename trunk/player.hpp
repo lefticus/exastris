@@ -85,8 +85,8 @@ namespace exastris
       Player(const std::string &t_name, const Location &t_location)
 	: m_name(t_name),
           m_location(t_location),
-	  m_fuel_capacity(.1),
-	  m_fuel_level(.1),
+	  m_fuel_capacity(.08),
+	  m_fuel_level(.08),
 	  m_money(10)
       {
 	m_stats.add("Weaponry", .1);

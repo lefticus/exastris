@@ -98,8 +98,20 @@ namespace exastris
     return m_universe.get_galaxy(t_loc.first).get_planet(t_loc.second);
   }
 
+  Planet Game::get_selected_planet()
+  {
+    return m_universe.get_galaxy(m_selected_planet.first)
+      .get_planet(m_selected_planet.second);
+  }
+
+  void Game::set_selected_planet(const Location &t_loc)
+  {
+    m_selected_planet = t_loc;
+  }
+
   bool Game::move_to(const Location &t_loc)
   {
+    m_selected_planet = t_loc;
     Location curloc = m_player.get_location();
     if (curloc.first != t_loc.first)
     { 
