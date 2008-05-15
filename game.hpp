@@ -164,11 +164,13 @@ namespace exastris
       void perform_action(const Action &a);
 
       Galaxy get_current_galaxy();
+      Planet get_planet(const Location &t_loc);
       bool move_to(const Location &t_loc);
 
       std::vector<Ware_For_Sale> get_wares_for_sale();
       std::vector<Ware_For_Purchase> get_wares_for_purchase();
 
+      std::vector<std::pair<double, Location> > get_planets_in_range();
 
     private:
       Universe m_universe;

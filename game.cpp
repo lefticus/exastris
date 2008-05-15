@@ -66,10 +66,36 @@ namespace exastris
     return wares;
   }
 
+  std::vector<std::pair<double, Location> > Game::get_planets_in_range()
+  {
+    std::vector<std::pair<double, Location> > planets;
+    Location curloc = m_player.get_location();
+    Galaxy curgal = m_universe.get_galaxy(curloc.first);
+    Planet curp = curgal.get_planet(curloc.second);
+
+    double distance_can_travel = m_player.distance_able_to_travel();
+
+    for (int i = 0; i < curgal.num_planets(); ++i)
+    {
+      Planet p = curgal.get_planet(i);
+      double distance = p.distance(curp);
+      if (distance <= distance_can_travel)
+      {
+        planets.push_back(std::make_pair(distance, Location(curloc.first, i)));
+      }
+    }
+
+    return planets;
+  }
 
   Galaxy Game::get_current_galaxy()
   {
     return m_universe.get_galaxy(m_player.get_location().first);
+  }
+
+  Planet Game::get_planet(const Location &t_loc)
+  {
+    return m_universe.get_galaxy(t_loc.first).get_planet(t_loc.second);
   }
 
   bool Game::move_to(const Location &t_loc)
