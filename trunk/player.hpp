@@ -144,6 +144,12 @@ namespace exastris
 	return m_fuel_level;
       }
 
+      double get_available_fuel_capacity() const
+      {
+	return m_fuel_capacity - m_fuel_level;
+      }
+
+
       double distance_able_to_travel() const
       {
 	return m_fuel_level;
@@ -173,6 +179,14 @@ namespace exastris
       double get_money() const
       {
 	return m_money;
+      }
+
+      void fill_up(double fuelcost)
+      {
+	double amountspent = std::min(fuelcost * get_available_fuel_capacity(),
+	    m_money);
+	m_money -= amountspent;
+	m_fuel_level += amountspent / fuelcost;
       }
 
 
