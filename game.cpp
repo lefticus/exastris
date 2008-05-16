@@ -109,6 +109,11 @@ namespace exastris
     m_selected_planet = t_loc;
   }
 
+  double Game::get_price_of_fuel() const
+  {
+    return .1;
+  }
+
   bool Game::move_to(const Location &t_loc)
   {
     m_selected_planet = t_loc;

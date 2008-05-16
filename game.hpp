@@ -172,6 +172,7 @@ namespace exastris
 
       Planet get_selected_planet();
       void set_selected_planet(const Location &t_loc);
+      double get_price_of_fuel() const;
 
       std::vector<std::pair<double, Location> > get_planets_in_range();
 
