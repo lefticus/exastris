@@ -62,7 +62,7 @@ namespace exastris
 	  return boost::shared_ptr<State>(new On_Planet_State(m_game));
 	  break;
 	default:
-	  m_game.get_player().purchase_wares(
+	  m_game.purchase_wares(
 	      m_wares[t_a.m_id],
 	    dynamic_cast<const exastris::Action::Integer &>(*t_a.m_type).m_value);
 	  return boost::shared_ptr<State>(new Buy_Goods_State(m_game));

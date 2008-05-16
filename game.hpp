@@ -173,6 +173,11 @@ namespace exastris
       Planet get_selected_planet();
       void set_selected_planet(const Location &t_loc);
       double get_price_of_fuel() const;
+      double get_ware_price(const std::string &t_name, bool purchase) const;
+
+      Planet get_current_planet() const;
+
+      void purchase_wares(const Ware_For_Sale &t_wfs, int quantity);
 
       std::vector<std::pair<double, Location> > get_planets_in_range();
 
@@ -180,7 +185,9 @@ namespace exastris
       Universe m_universe;
       Player m_player;
       Location m_selected_planet;
+      double m_distancetraveled;
 
+      std::map<std::string, int> m_wares_purchased;
       boost::shared_ptr<State> m_current_state;
   };
 }

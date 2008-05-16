@@ -87,7 +87,7 @@ namespace exastris
           m_location(t_location),
 	  m_fuel_capacity(.08),
 	  m_fuel_level(.08),
-	  m_money(10)
+	  m_money(20)
       {
 	m_stats.add("Weaponry", .1);
 	m_stats.add("Piloting", .1);

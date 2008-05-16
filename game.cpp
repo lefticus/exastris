@@ -11,6 +11,7 @@ namespace exastris
   Game::Game(int t_seed)
     : m_universe(Mersenne_Twister(t_seed)),
     m_player("Jameson", m_universe.random_location()),
+    m_distancetraveled(0),
     m_current_state(new Begin_Game_State(*this))
   {
   }
@@ -28,7 +29,6 @@ namespace exastris
   std::vector<Action> Game::get_current_actions()
   {
     return m_current_state->get_current_actions();
-
   }
 
   std::string Game::get_current_state_description()
@@ -43,10 +43,41 @@ namespace exastris
 
   std::vector<Ware_For_Sale> Game::get_wares_for_sale()
   {
+    Planet p = get_current_planet();
     std::vector<Ware_For_Sale> wares;
-    wares.push_back(Ware_For_Sale("Ore", .99, 5));
+
+    const int max = 20;
+    const Planetary_Stats &pstats = p.m_planet_stats;
+
+    const int ore = pstats.m_red * max;
+    const int food = pstats.m_green * max;
+    const int water = pstats.m_blue * max;
+
+    wares.push_back(Ware_For_Sale("Ore", get_ware_price("Ore", false), ore-m_wares_purchased["Ore"]));
+    wares.push_back(Ware_For_Sale("Food", get_ware_price("Food", false), food-m_wares_purchased["Food"]));
+    wares.push_back(Ware_For_Sale("Water", get_ware_price("Water", false), water-m_wares_purchased["Water"])) ;
     return wares;
   }
+
+  double Game::get_ware_price(const std::string &t_name, bool purchase) const
+  {
+    const Planetary_Stats &pstats = get_current_planet().m_planet_stats;
+    const int nominalvalue = 10;
+    const int modifier(purchase?1:-1);
+
+    if (t_name == "Ore")
+    {
+      return (1 + modifier * (pstats.m_red - .5) * .5) * nominalvalue;
+    } else if (t_name == "Food") {
+      return (1 + modifier * (pstats.m_green- .5) * .5) * nominalvalue;
+    } else if (t_name == "Water") {
+      return (1 + modifier * (pstats.m_blue- .5) * .5) * nominalvalue;
+    } else {
+      return 0;
+    }
+  }
+
+
 
   std::vector<Ware_For_Purchase> Game::get_wares_for_purchase()
   {
@@ -60,7 +91,7 @@ namespace exastris
 	 ++itr)
     {
       wares.push_back(Ware_For_Purchase(itr->first,
-	    .98, itr->second.m_average_cost, itr->second.m_quantity));
+	    get_ware_price(itr->first, true), itr->second.m_average_cost, itr->second.m_quantity));
     }
 
     return wares;
@@ -104,6 +135,18 @@ namespace exastris
       .get_planet(m_selected_planet.second);
   }
 
+  void Game::purchase_wares(const Ware_For_Sale &t_wfs, int quantity)
+  {
+    m_player.purchase_wares(t_wfs, quantity);
+    m_wares_purchased[t_wfs.m_name] += quantity;
+  }
+ 
+  Planet Game::get_current_planet() const
+  {
+    Location l = m_player.get_location();
+    return m_universe.get_galaxy(l.first).get_planet(l.second);
+  }
+
   void Game::set_selected_planet(const Location &t_loc)
   {
     m_selected_planet = t_loc;
@@ -111,7 +154,7 @@ namespace exastris
 
   double Game::get_price_of_fuel() const
   {
-    return .1;
+    return 75;
   }
 
   bool Game::move_to(const Location &t_loc)
@@ -126,11 +169,13 @@ namespace exastris
       Planet newplanet = m_universe.get_galaxy(t_loc.first).get_planet(t_loc.second);
 
       double distance = curplanet.distance(newplanet);
+      m_distancetraveled += distance;
 
       if (distance <= m_player.get_fuel_level())
       {
 	m_player.use_fuel(distance);
 	m_player.set_location(t_loc);
+	m_wares_purchased.clear();
 	return true;
       } else {
 	return false;
