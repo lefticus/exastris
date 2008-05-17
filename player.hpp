@@ -92,6 +92,7 @@ namespace exastris
       {
 	m_stats.add("Weaponry", .1);
 	m_stats.add("Piloting", .1);
+        m_stats.add("Negotiating", .1);
       }
 
 
