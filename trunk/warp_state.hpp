@@ -28,8 +28,16 @@ namespace exastris
     {
       Planet p = m_game.get_planet(m_planets_in_range[0].second);
       std::stringstream ss;
-      
-      ss << "Planet: " << p.get_number();
+
+      std::vector<std::string> stats = m_game.get_player().get_sensor_readings(p);
+      ss << "Warp";
+      for (std::vector<std::string>::const_iterator itr = stats.begin();
+           itr != stats.end();
+           ++itr)
+      {
+        ss << std::endl << *itr;
+      }
+
       set_description(ss.str());
 
       std::vector<Action> actions;

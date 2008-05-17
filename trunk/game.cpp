@@ -67,11 +67,11 @@ namespace exastris
 
     if (t_name == "Ore")
     {
-      return (1 + modifier * (pstats.m_red - .5) * .5) * nominalvalue;
+      return (1 - ((pstats.m_red * 2 - 1) * .8)) * nominalvalue;
     } else if (t_name == "Food") {
-      return (1 + modifier * (pstats.m_green- .5) * .5) * nominalvalue;
+      return (1 - ((pstats.m_green * 2 - 1) * .8)) * nominalvalue;
     } else if (t_name == "Water") {
-      return (1 + modifier * (pstats.m_blue- .5) * .5) * nominalvalue;
+      return (1 - ((pstats.m_blue * 2 - 1) * .8)) * nominalvalue;
     } else {
       return 0;
     }
