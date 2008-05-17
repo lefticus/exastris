@@ -6,6 +6,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <sstream>
 
 namespace exastris
 {
@@ -91,6 +92,28 @@ namespace exastris
       {
 	m_stats.add("Weaponry", .1);
 	m_stats.add("Piloting", .1);
+      }
+
+
+
+      std::vector<std::string> get_sensor_readings(const Planet &t_planet)
+      {
+        std::vector<std::string> readings;
+
+        std::stringstream ss;
+        ss << "Planet ID: " << t_planet.m_number;
+        readings.push_back(ss.str());
+        ss.str("");
+        ss << "Ore composition (" << int(t_planet.m_planet_stats.m_red * 100) << " of 100)";
+        readings.push_back(ss.str());
+        ss.str("");
+        ss << "Vegetation composition (" << int(t_planet.m_planet_stats.m_green * 100) << " of 100)";
+        readings.push_back(ss.str());
+        ss.str("");
+        ss << "Water composition (" << int(t_planet.m_planet_stats.m_blue * 100) << " of 100)";
+        readings.push_back(ss.str());
+
+        return readings;
       }
 
       void set_name(const std::string &s)
