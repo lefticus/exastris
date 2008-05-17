@@ -63,17 +63,29 @@ namespace exastris
   {
     const Planetary_Stats &pstats = get_current_planet().m_planet_stats;
     const int nominalvalue = 10;
-    const int modifier(purchase?1:-1);
+
+    double baseprice (0); 
 
     if (t_name == "Ore")
     {
-      return (1 - ((pstats.m_red * 2 - 1) * .8)) * nominalvalue;
+      baseprice = (1 - ((pstats.m_red * 2 - 1) * .8)) * nominalvalue;
     } else if (t_name == "Food") {
-      return (1 - ((pstats.m_green * 2 - 1) * .8)) * nominalvalue;
+      baseprice = (1 - ((pstats.m_green * 2 - 1) * .8)) * nominalvalue;
     } else if (t_name == "Water") {
-      return (1 - ((pstats.m_blue * 2 - 1) * .8)) * nominalvalue;
+      baseprice = (1 - ((pstats.m_blue * 2 - 1) * .8)) * nominalvalue;
     } else {
-      return 0;
+      baseprice = 0;
+    }
+
+    double negotiating_skill = m_player.get_stats()["Negotiating"];
+
+    double negotiation_modifier = (1 - negotiating_skill) * baseprice * .5;
+
+    if (purchase)
+    {
+      return baseprice - negotiation_modifier;
+    } else {
+      return baseprice + negotiation_modifier;
     }
   }
 
