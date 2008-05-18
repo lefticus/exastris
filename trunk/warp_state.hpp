@@ -5,7 +5,7 @@
 #include <boost/shared_ptr.hpp>
 #include <vector>
 #include "on_planet_state.hpp"
-
+#include "warping_to_state.hpp"
 namespace exastris
 {
   struct Warp_State : State
@@ -91,8 +91,8 @@ namespace exastris
 	  return boost::shared_ptr<State>(new Warp_State(m_game, m_planets_in_range));
 
 	case 2:
-	  m_game.move_to(m_planets_in_range[0].second);
-	  return boost::shared_ptr<State>(new On_Planet_State(m_game));
+	  return boost::shared_ptr<State>(new Warping_To_State(m_game, 
+                m_game.get_selected_planet()));
 
 	case 3:
 	  return boost::shared_ptr<State>(new On_Planet_State(m_game));

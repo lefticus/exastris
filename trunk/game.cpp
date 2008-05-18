@@ -89,6 +89,10 @@ namespace exastris
     }
   }
 
+  Warp_Encounters Game::get_warp_encounters(const Planet &p)
+  {
+    return Warp_Encounters();
+  }
 
 
   std::vector<Ware_For_Purchase> Game::get_wares_for_purchase()
@@ -167,6 +171,11 @@ namespace exastris
   double Game::get_price_of_fuel() const
   {
     return 75;
+  }
+
+  bool Game::move_to(const Planet &t_p)
+  {
+    return move_to(Location(m_player.get_location().first, t_p.get_number()));
   }
 
   bool Game::move_to(const Location &t_loc)

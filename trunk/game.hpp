@@ -12,6 +12,7 @@ namespace exastris
 {
   class Game;
 
+  typedef std::vector<std::string> Warp_Encounters;
 
   struct Action
   {
@@ -166,6 +167,7 @@ namespace exastris
       Galaxy get_current_galaxy();
       Planet get_planet(const Location &t_loc);
       bool move_to(const Location &t_loc);
+      bool move_to(const Planet &t_p);
 
       std::vector<Ware_For_Sale> get_wares_for_sale();
       std::vector<Ware_For_Purchase> get_wares_for_purchase();
@@ -176,6 +178,8 @@ namespace exastris
       double get_ware_price(const std::string &t_name, bool purchase) const;
 
       Planet get_current_planet() const;
+
+      Warp_Encounters get_warp_encounters(const Planet &p);
 
       void purchase_wares(const Ware_For_Sale &t_wfs, int quantity);
 
