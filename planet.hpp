@@ -36,7 +36,7 @@ namespace exastris
 	return distance(x, y, m_x, m_y) < m_size;
       }
 
-      int get_number()
+      int get_number() const
       {
 	return m_number;
       }
