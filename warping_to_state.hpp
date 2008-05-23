@@ -36,18 +36,32 @@ namespace exastris
             Action("OK", 0, boost::shared_ptr<Action::InputType>
               (new Action::None())));
       } else {
-        /*
-        actions.push_back(
-            Action("Next Planet In Range", 1, boost::shared_ptr<Action::InputType>
-              (new Action::None())));
+        std::stringstream ss;
+        ss << "At " << m_warp_encounters[0].m_num_clicks << " clicks to the next panet\n";
+        ss << "you encounter a ";
+        if (m_warp_encounters[0].m_type == Warp_Encounter::Police)
+        {
+          ss << "police";
+        } else {
+          ss << "pirate";
+        }
 
-        actions.push_back(
-            Action("Warp To", 2, boost::shared_ptr<Action::InputType>(new Action::None())));
+        ss << " vessel.\n";
 
-        actions.push_back(
-            Action("Back", 3, boost::shared_ptr<Action::InputType>
-              (new Action::None())));
-              */
+        if (!m_warp_encounters[0].m_detected)
+        {
+          ss << "The approaching vessel has not detected you";
+          actions.push_back(
+              Action("Ignore", 1, boost::shared_ptr<Action::InputType>
+                (new Action::None())));
+        } else {
+          actions.push_back(
+              Action("Flee", 2, boost::shared_ptr<Action::InputType>
+                (new Action::None())));
+        }
+
+
+        set_description(ss.str());
       }
 
       return actions;
@@ -62,7 +76,8 @@ namespace exastris
 	  return boost::shared_ptr<State>(new On_Planet_State(m_game));
 
 	default:
-	  return boost::shared_ptr<State>(new Warping_To_State(m_game, m_on_route_to, m_warp_encounters));
+
+	  return boost::shared_ptr<State>(new Warping_To_State(m_game, m_on_route_to, Warp_Encounters(++m_warp_encounters.begin(),m_warp_encounters.end())));
       };
     }
 

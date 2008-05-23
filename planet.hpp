@@ -21,12 +21,12 @@ namespace exastris
       {
       }
 
-      double distance(double x1, double y1, double x2, double y2)
+      double distance(double x1, double y1, double x2, double y2) const
       {
 	return sqrt(pow(fabs(x1 - x2), 2) + pow(fabs(y1 - y2), 2));
       }
 
-      double distance(const Planet &p)
+      double distance(const Planet &p) const
       {
 	return distance(m_x, m_y, p.m_x, p.m_y);
       }

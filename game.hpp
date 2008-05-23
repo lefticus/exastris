@@ -12,7 +12,28 @@ namespace exastris
 {
   class Game;
 
-  typedef std::vector<std::string> Warp_Encounters;
+  struct Warp_Encounter
+  {
+    enum type
+    {
+      Police,
+      Pirate
+    };
+
+    Warp_Encounter(type t_type, bool t_detected, int t_num_clicks)
+      : m_type(t_type),
+        m_detected(t_detected),
+        m_num_clicks(t_num_clicks)
+    {
+    }
+
+    bool m_type;
+    bool m_detected;
+    int m_num_clicks;
+
+  };
+
+  typedef std::vector<Warp_Encounter> Warp_Encounters;
 
   struct Action
   {
@@ -186,6 +207,7 @@ namespace exastris
       std::vector<std::pair<double, Location> > get_planets_in_range();
 
     private:
+      Mersenne_Twister m_random_number_generator;
       Universe m_universe;
       Player m_player;
       Location m_selected_planet;
