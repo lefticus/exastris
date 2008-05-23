@@ -5,14 +5,16 @@
 #include "begin_game_state.hpp"
 #include <boost/shared_ptr.hpp>
 #include <vector>
+#include <iostream>
 
 namespace exastris
 {
   Game::Game(int t_seed)
-    : m_universe(Mersenne_Twister(t_seed)),
-    m_player("Jameson", m_universe.random_location()),
-    m_distancetraveled(0),
-    m_current_state(new Begin_Game_State(*this))
+    : m_random_number_generator(t_seed),
+      m_universe(m_random_number_generator),
+      m_player("Jameson", m_universe.random_location()),
+      m_distancetraveled(0),
+      m_current_state(new Begin_Game_State(*this))
   {
   }
 
@@ -89,9 +91,34 @@ namespace exastris
     }
   }
 
-  Warp_Encounters Game::get_warp_encounters(const Planet &p)
+  Warp_Encounters Game::get_warp_encounters(const Planet &t_p)
   {
-    return Warp_Encounters();
+    Planet curplanet = get_current_planet();
+    int clicks = t_p.distance(curplanet) * 150;
+    std::cout << clicks << " clicks traveled" << std::endl;
+
+    Warp_Encounters encounters;
+
+    const double navigation_skill = m_player.get_stats()["Navigation"];
+
+    for (int i = 1; i <= clicks; ++i)
+    {
+      const double gvmtcontrol = (curplanet.m_planet_stats.m_governmental_control_level * (clicks - i) + t_p.m_planet_stats.m_governmental_control_level * i)/clicks;
+
+      const bool policeencounter = m_random_number_generator.next(0.0, 1.0) < gvmtcontrol;
+      const bool pirateencounter = m_random_number_generator.next(0.0, 1.0) > gvmtcontrol;
+      const bool detected = m_random_number_generator.next(0.0, 1.0) > navigation_skill;
+
+      std::cout << i << " clicks from next planet policeencounter: " << policeencounter <<
+        " pirateencounter: " << pirateencounter << " govmtcontrollevel " << gvmtcontrol << " detectedbyothership: " << detected << std::endl;
+
+      if (policeencounter)
+        encounters.push_back(Warp_Encounter(Warp_Encounter::Police, detected, clicks - i));
+      else
+        encounters.push_back(Warp_Encounter(Warp_Encounter::Pirate, detected, clicks - i));
+    }
+
+    return encounters;
   }
 
 
