@@ -165,6 +165,7 @@ protected:
   void on_button2_clicked();
   void on_game_changed();
   void on_cursor_changed();
+  void on_row_activated(const Gtk::TreeModel::Path &path, Gtk::TreeViewColumn *column);
 
   // Child widgets
   Gtk::VBox m_box0;
@@ -207,6 +208,8 @@ Ex_Astris_GTK::Ex_Astris_GTK()
   m_area.signal_game_changed.connect(sigc::mem_fun(*this, &Ex_Astris_GTK::on_game_changed));
 
   m_listviewtext.signal_cursor_changed().connect(sigc::mem_fun(*this, &Ex_Astris_GTK::on_cursor_changed));
+
+  m_listviewtext.signal_row_activated().connect(sigc::mem_fun(*this, &Ex_Astris_GTK::on_row_activated));
 
   //Add the TreeView, inside a ScrolledWindow, with the button underneath:
   m_scrolledwindow.add(m_listviewtext);
@@ -252,6 +255,20 @@ Ex_Astris_GTK::~Ex_Astris_GTK()
 {
 }
 
+void Ex_Astris_GTK::on_row_activated(const Gtk::TreeModel::Path &path, Gtk::TreeViewColumn *column)
+{
+  Gtk::ListViewText::SelectionList list = m_listviewtext.get_selected();
+  if (!list.empty())
+  {
+    std::cout << " new row selected: " << list.front() << std::endl;
+    exastris::Action action = m_actions[list.front()];
+
+    if ((dynamic_cast<exastris::Action::None *>(action.m_type.get()))) {
+      on_button1_clicked();
+    }
+  }
+}
+
 void Ex_Astris_GTK::on_cursor_changed()
 {
   Gtk::ListViewText::SelectionList list = m_listviewtext.get_selected();
@@ -281,8 +298,6 @@ void Ex_Astris_GTK::on_cursor_changed()
       m_spinbutton.set_range(inttype->m_minvalue, inttype->m_maxvalue);
       m_spinbutton.set_value(inttype->m_value);
       m_spinbutton.show();
-    } else if ((dynamic_cast<exastris::Action::None *>(action.m_type.get()))) {
-      on_button1_clicked();
     }
   }
 }
