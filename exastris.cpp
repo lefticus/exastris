@@ -1,23 +1,3 @@
-//$Id: radar.cc 969 2008-02-23 18:39:51Z murrayc $ -*- c++ -*-
-
-/* gtkmm example Copyright (C) 2002 gtkmm development team
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
- *
- * This example was originally provided by Alain Roughe <alain.rouge@enac.fr>
-*/
-
 
 #include <gtkmm/drawingarea.h>
 #include <gdkmm/colormap.h>
@@ -29,10 +9,10 @@
 #include <gtkmm/spinbutton.h>
 #include <gtkmm/statusbar.h>
 #include <gtkmm/listviewtext.h>
+#include <gtkmm/scrolledwindow.h>
 #include <gtkmm/window.h>
 #include <gtkmm/main.h>
 
-#include <math.h> //Needed by the IRIX MipsPro compiler, for sin().
 #include <sstream>
 #include <iostream>
 #include "game.hpp"
@@ -40,11 +20,11 @@
 
 #include <pangomm/fontdescription.h>
 
-class PPI : public Gtk::DrawingArea
+class Galaxy : public Gtk::DrawingArea
 {
 public:
-  PPI(exastris::Game &);
-  virtual ~PPI();
+  Galaxy(exastris::Game &);
+  virtual ~Galaxy();
   bool timer_callback();
 
   sigc::signal< void > signal_game_changed;
@@ -61,26 +41,26 @@ private:
 };
 
 
-PPI::PPI(exastris::Game &t_game)
+Galaxy::Galaxy(exastris::Game &t_game)
   : m_game(t_game)
 {
   add_events(Gdk::EXPOSURE_MASK|Gdk::BUTTON_PRESS_MASK );
 }
 
 
-PPI::~PPI()
+Galaxy::~Galaxy()
 {
 }
 
 
-void PPI::on_realize()
+void Galaxy::on_realize()
 {
   // We need to call the base on_realize()
   Gtk::DrawingArea::on_realize();
 
 }
 
-bool PPI::on_button_press_event(GdkEventButton*e)
+bool Galaxy::on_button_press_event(GdkEventButton*e)
 {
   Gtk::Allocation allocation = get_allocation();
   const int width = allocation.get_width();
@@ -100,7 +80,7 @@ bool PPI::on_button_press_event(GdkEventButton*e)
   return true;
 }
 
-bool PPI::on_expose_event(GdkEventExpose*)
+bool Galaxy::on_expose_event(GdkEventExpose*)
 {
   // we need a ref to the gdkmm window
   Glib::RefPtr<Gdk::Window> window = get_window();
@@ -173,11 +153,11 @@ bool PPI::on_expose_event(GdkEventExpose*)
 
 
 
-class Radar : public Gtk::Window
+class Ex_Astris_GTK : public Gtk::Window
 {
 public:
-  Radar();
-  virtual ~Radar();
+  Ex_Astris_GTK();
+  virtual ~Ex_Astris_GTK();
   
 protected:
   //signal handlers:
@@ -197,16 +177,17 @@ protected:
   Gtk::Button m_button1;
   Gtk::Button m_button2;
   Gtk::Label m_label;
+  Gtk::ScrolledWindow m_scrolledwindow;
   Gtk::ListViewText m_listviewtext;
   exastris::Game m_game;
   Gtk::Statusbar m_sb;
 
-  PPI m_area;
+  Galaxy m_area;
   std::vector<exastris::Action> m_actions;
 };
 
 
-Radar::Radar()
+Ex_Astris_GTK::Ex_Astris_GTK()
   : m_box0(/*homogeneous*/false, /*spacing*/5), m_box1(false, 5), m_box2(false, 5), m_box3(false, 5), 
     m_entry(),
     m_spinbutton(),
@@ -221,16 +202,23 @@ Radar::Radar()
 
 
   // box2
-  m_button2.signal_clicked().connect(sigc::mem_fun(*this, &Radar::on_button2_clicked));
-  m_button1.signal_clicked().connect(sigc::mem_fun(*this, &Radar::on_button1_clicked));
-  m_area.signal_game_changed.connect(sigc::mem_fun(*this, &Radar::on_game_changed));
+  m_button2.signal_clicked().connect(sigc::mem_fun(*this, &Ex_Astris_GTK::on_button2_clicked));
+  m_button1.signal_clicked().connect(sigc::mem_fun(*this, &Ex_Astris_GTK::on_button1_clicked));
+  m_area.signal_game_changed.connect(sigc::mem_fun(*this, &Ex_Astris_GTK::on_game_changed));
 
-  m_listviewtext.signal_cursor_changed().connect(sigc::mem_fun(*this, &Radar::on_cursor_changed));
+  m_listviewtext.signal_cursor_changed().connect(sigc::mem_fun(*this, &Ex_Astris_GTK::on_cursor_changed));
+
+  //Add the TreeView, inside a ScrolledWindow, with the button underneath:
+  m_scrolledwindow.add(m_listviewtext);
+
+  //Only show the scrollbars when they are necessary:
+  m_scrolledwindow.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+
  
 
   m_box2.pack_start(m_label, Gtk::PACK_SHRINK, 5);
 //  m_box2.pack_start(m_box3, /*Gtk::PackOptions*/Gtk::PACK_EXPAND_WIDGET, /*padding*/5);
-  m_box2.pack_start(m_listviewtext, Gtk::PACK_EXPAND_WIDGET, 5);
+  m_box2.pack_start(m_scrolledwindow, Gtk::PACK_EXPAND_WIDGET, 5);
   m_box2.pack_start(m_entry, Gtk::PACK_SHRINK, 5);
   m_box2.pack_start(m_spinbutton, Gtk::PACK_SHRINK, 5);
   m_box2.pack_start(m_button1, Gtk::PACK_SHRINK, 5);
@@ -238,7 +226,7 @@ Radar::Radar()
   
   // box1
   m_area.set_size_request(300, 300);
-  m_listviewtext.set_size_request(300, 100);
+  m_scrolledwindow.set_size_request(300, 100);
   m_box1.pack_start(m_area, Gtk::PACK_EXPAND_WIDGET, 5);
   m_box1.pack_start(m_box2, Gtk::PACK_SHRINK, 5);
     
@@ -260,11 +248,11 @@ Radar::Radar()
 }
 
 
-Radar::~Radar()
+Ex_Astris_GTK::~Ex_Astris_GTK()
 {
 }
 
-void Radar::on_cursor_changed()
+void Ex_Astris_GTK::on_cursor_changed()
 {
   Gtk::ListViewText::SelectionList list = m_listviewtext.get_selected();
   if (!list.empty())
@@ -301,7 +289,7 @@ void Radar::on_cursor_changed()
 
 
 
-void Radar::on_button1_clicked()
+void Ex_Astris_GTK::on_button1_clicked()
 {
   Gtk::ListViewText::SelectionList list = m_listviewtext.get_selected();
   if (!list.empty())
@@ -325,12 +313,12 @@ void Radar::on_button1_clicked()
   }
 }
 
-void Radar::on_button2_clicked()
+void Ex_Astris_GTK::on_button2_clicked()
 {
   hide();
 }
 
-void Radar::on_game_changed()
+void Ex_Astris_GTK::on_game_changed()
 {
   m_area.queue_draw();
   std::vector<exastris::Action> options 
@@ -357,8 +345,8 @@ int main(int argc, char** argv)
 {
   Gtk::Main main_instance (argc, argv);
 
-  Radar radar;
-  Gtk::Main::run(radar);
+  Ex_Astris_GTK ex_astris;
+  Gtk::Main::run(ex_astris);
 
   return 0;
 }
